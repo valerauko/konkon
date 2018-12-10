@@ -91,6 +91,7 @@
                              rest
                              (map base64-padfix))]
     (if (and id secret)
+      ; TODO: separate client_secret auth and client_id only auth
       (db/find-for-session conn {:client-id id
                                  :client-secret secret
                                  :redirect-uri redirect-uri})
