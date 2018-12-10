@@ -2,7 +2,7 @@ version: '3'
 services:
   server:
     image: clojure:lein-alpine
-    container_name: server
+    hostname: kitsune-api
     working_dir: /root
     command: lein repl :headless :host 0.0.0.0 :port 38001
     ports:
@@ -19,7 +19,6 @@ services:
 
   docker_db:
     image: postgres:alpine
-    container_name: docker_db
     volumes:
       - ./psql:/var/lib/postgresql/data
     environment:
