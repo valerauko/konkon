@@ -51,14 +51,10 @@
 
 (defn uri-for-redirect
   [input {code :auth-code} state]
-  (-> input
-    uri/uri
-    (uri/param "code" code) ; add the code
-    (#(if state (uri/param % "state" state) %)) ; echo state if present
-    (#(if (or (= (uri/scheme %) "http") ; if it's http or empty make it https
-              (= nil (uri/scheme %)))
-      (uri/scheme % "https") %)) ; TODO: don't change in development
-    str)) ; has to be string for redirect
+  (let [code-added (uri/param input "code" code)]
+    (str (if state
+           (uri/param code-added "state" state)
+           code-added)))) ; has to be string for redirect
 
 (defhandler authorize
   [{{:keys [client-id redirect-uri email password scope state]
