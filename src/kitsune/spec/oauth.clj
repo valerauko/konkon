@@ -1,16 +1,23 @@
 (ns kitsune.spec.oauth
   (:require [clojure.spec.alpha :as s]
             [clojure.string :refer [split]]
+            [org.bovinegenius [exploding-fish :as uri]]
             [kitsune.spec.user :as user]))
 
 (s/def ::name string?)
 (s/def ::client-name string?)
 (s/def ::scopes string?)
-(s/def ::scope-array
+(s/def ::scope-coll
   (s/coll-of #{"read" "write" "follow" "push"} :distinct true :min-count 1))
-; TODO: proper url validation
-(s/def ::website string?)
-(s/def ::redirect-uri string?)
+
+(s/def ::website uri/absolute?)
+(s/def ::redirect-uri
+  (s/or :default-value #(= % "urn:ietf:wg:oauth:2.0:oob")
+        :absolute-uri (s/and uri/absolute?
+                             #(empty? (uri/fragment %))
+                             #(= (uri/scheme %) "https"))))
+(s/def ::uri-coll
+  (s/coll-of ::redirect-uri))
 (s/def ::redirect-uris string?)
 
 (s/def ::create-app
@@ -39,12 +46,18 @@
 (def auth-header-req
   {:header (s/keys :req-un [::authorization])})
 
-(defn valid-scope
+(defn coerce-scopes
   [input]
-  (let [scopes (split input #"\s+")]
-    (when (s/valid? ::scope-array scopes)
+  (let [scopes (split (str input) #"\s+")]
+    (when (s/valid? ::scope-coll scopes)
       ; need to sort it for certain equality
       (sort scopes))))
+
+(defn coerce-uris
+  [raw-input]
+  (let [input-array (split (str raw-input) #"\s+")]
+    (if (s/valid? ::uri-coll input-array)
+      (sort (uniq input-array))))) ; maybe use set?
 
 (s/def ::password ::user/pass)
 (s/def ::grant-type #{"authorization-code" "password" "refresh-token"})

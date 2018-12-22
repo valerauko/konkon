@@ -1,15 +1,35 @@
 (ns kitsune.oauth-test
-  (:require [clojure.test :refer :all]))
+  (:require [clojure.test :refer :all]
+            [kitsune.spec.oauth :as spec]))
 
 (deftest app-registration
   (testing "App registration"
     (testing "Scope validation"
-      (testing "At least one scope is required")
-      (testing "Unkowm scopes are ignored"))
-    (testing "Redirect URIs"
-      (testing "Given none, default is saved")
-      (testing "Given any, they are saved"))
-    (testing "Return values")))
+      (testing "At least one scope is required"
+        (let [coerced (spec/coerce-scopes nil)]
+          (is (= coerced nil)))
+        (let [coerced (spec/coerce-scopes "")]
+          (is (= coerced nil))))
+      (testing "Unkowm scopes are ignored"
+        (let [coerced (spec/coerce-scopes "read write hoge")]
+          (is (= coerced ["read write"])))))
+    (testing "Redirect URI validation"
+      (testing "Given none or the default, the default is used"
+        (let [coerced (spec/coerce-uris nil)]
+          (is (= coerced ["urn:ietf:wg:oauth:2.0:oob"]))))
+      (testing "All given redirect URIs have to be absolute URIs"
+        (let [coerced (spec/coerce-uris "./usr/local/hoge https://example.com")]
+          (is (= coerced nil))))
+      (testing "Only HTTPS redirect URIs are allowed"
+        (let [coerced (spec/coerce-uris "http://example.com https://example.com")]
+          (is (= coerced nil))))
+      (testing "Query params in the redirect URIs are retained"
+        (let [uri "https://example.com?key=value"
+              coerced (spec/coerce-uris uri)]
+          (is (= coerced [uri]))))
+      (testing "The redirect URIs may not contain a fragment"
+        (let [coerced (spec/coerce-uris "https://example.com#fragment")]
+          (is (= coerced nil)))))))
 
 (deftest app-identification
   (testing "Based on authorization header"
@@ -19,11 +39,11 @@
 
 (deftest app-verification
   (testing "App verification"
-    (app-identification)
+    ; (app-identification)
     (testing "Returns the app associated with the given credentials")))
 
 (deftest authorization-verification
-  (app-identification)
+  ; (app-identification)
   (testing "App authn failure") ; display error
   (testing "Response type"
     (testing "Only `code` is supported")) ; unsupported_response_type
@@ -37,11 +57,11 @@
     (testing "Given none, default is used")))
 
 (deftest authorization-form
-  (authorization-verification)
+  ; (authorization-verification)
   (testing "Display authorization form"))
 
 (deftest authorization
-  (authorization-verification)
+  ; (authorization-verification)
   (testing "Authorization request"
     (testing "User authentication failure"
       (testing "Displays the form again"))
@@ -50,7 +70,7 @@
       (testing "Denied")))) ; access_denied
 
 (deftest token-exchange
-  (app-identification)
+  ; (app-identification)
   (testing "Grant type `authorization_code`"
     (testing "Correct `code` parameter required") ; invalid_grant
     (testing "Each `code` may only be used once"))

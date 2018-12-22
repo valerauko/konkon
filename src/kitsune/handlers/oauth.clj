@@ -14,16 +14,18 @@
 
 (defhandler register-app
   [{{:keys [scopes redirect-uris website client-name]} :body-params :as req}]
-  (if-let [scope-array (spec/valid-scope scopes)]
-    (if-let [result (db/create-app! conn
-                      {:website website
-                       :name client-name
-                       :redirect-uris (db/array-string redirect-uris)
-                       :scopes scope-array})]
-      (ok result)
-      ; REVIEW: this really shouldn't happen unless the fields are wrong type
-      ; or don't fit. maybe make it a 422 instead?
-      (internal-server-error {:error "Something went very wrong. Sorry."}))
+  (if-let [scope-array (spec/coerce-scopes scopes)]
+    (if-let [uri-array (spec/coerce-uris redirect-uris)]
+      (if-let [result (db/create-app! conn
+                                      {:website website
+                                       :name client-name
+                                       :redirect-uris redirect-uris
+                                       :scopes scope-array})]
+        (ok result)
+        ; REVIEW: this really shouldn't happen unless the fields are wrong type
+        ; or don't fit. maybe make it a 422 instead?
+        (internal-server-error {:error "Something went very wrong. Sorry."}))
+      (unprocessable-entity {:error "Invalid redirection URIs"}))
     (unprocessable-entity {:error "Requested scope(s) not acceptable."})))
 
 (def scope-meanings
