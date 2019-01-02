@@ -10,7 +10,7 @@
 
 (defn uuid
   []
-  (.toString (UUID/randomUUID)))
+  (str (UUID/randomUUID)))
 
 (defn new-status-uri
   []

@@ -40,6 +40,7 @@
                    :source-paths ["config/dev"]
                    :plugins [[jonase/eastwood "0.3.4"
                               :exclusions [org.clojure/clojure]]
+                             [lein-kibit "0.1.6"]
                              [lein-cloverage "1.0.13"
                               :exclusions [org.clojure/clojure]]
                              [lein-ancient "0.6.15"]]}})

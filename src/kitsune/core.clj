@@ -6,8 +6,7 @@
             [kitsune.env :as env]
             [kitsune.db.core :refer [conn]]
             [kitsune.routes.core :as routes]
-            [kitsune.db.migrations :as migrations]
-            [clojure.tools.namespace.repl :refer [refresh]])
+            [kitsune.db.migrations :as migrations])
   (:gen-class))
 
 (defstate ^{:on-reload :noop} http-server
@@ -19,22 +18,18 @@
   :stop
     (.close ^java.io.Closeable http-server))
 
-(defn stop-kitsune
+(defn stop-server
   []
   (doseq [component (:stopped (stop))]
-    (log/info component "stopped")))
+    (log/debug component "stopped"))
+  (shutdown-agents))
 
-(defn start-kitsune
+(defn start-server
   []
   (doseq [component (:started (start))]
-    (log/info component "started"))
-  (.addShutdownHook (Runtime/getRuntime) (Thread. ^Runnable stop-kitsune)))
-
-(defn reload
-  []
-  (stop-kitsune)
-  (refresh)
-  (start-kitsune))
+    (log/debug component "started"))
+  (.addShutdownHook (Runtime/getRuntime)
+                    (Thread. ^Runnable stop-server)))
 
 (defn -main [& args]
   (cond
@@ -48,4 +43,4 @@
                                          #'kitsune.db.core/conn)
                                   (migrations/rollback conn)
                                   (System/exit 0))
-    :else (start-kitsune)))
+    :else (start-server)))

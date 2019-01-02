@@ -41,7 +41,7 @@
   [{{id :id} :path-params :as req}]
   (let [rows (db/delete-object! conn {:id (read-string id)
                                       :user-id (-> req :auth :user-id)})]
-    (if (> rows 0)
+    (if (pos? rows)
       (ok {})
       (not-found {:error "Status not found"}))))
 

@@ -39,13 +39,13 @@
 ; these are from luminus too
 (defn result-one-snake->kebab
   [this result options]
-  (->> (result-one this result options)
-       (transform-keys ->kebab-case-keyword)))
+  (transform-keys ->kebab-case-keyword
+                  (result-one this result options)))
 
 (defn result-many-snake->kebab
   [this result options]
-  (->> (result-many this result options)
-       (map #(transform-keys ->kebab-case-keyword %))))
+  (map #(transform-keys ->kebab-case-keyword %)
+       (result-many this result options)))
 
 (defmethod hugsql.core/hugsql-result-fn :1 [sym]
   'kitsune.db.core/result-one-snake->kebab)
