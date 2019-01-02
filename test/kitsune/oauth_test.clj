@@ -31,16 +31,19 @@
         (let [coerced (spec/coerce-uris "https://example.com#fragment")]
           (is (= coerced nil)))))))
 
-(deftest app-identification
+(deftest client-id-auth
   (testing "Based on authorization header"
-    (testing "Uses `Basic` Authorization header"))
-  (testing "Based on `client_id` param"
-    (testing "Requires the matching `redirect_uri`")))
+    (testing "Has to be a `Basic` header")
+    (testing "It has to be Base64-encoded"))
+  (testing "Based on param"
+    (testing "Has to be a known `client_id`")))
 
-(deftest app-verification
-  (testing "App verification"
-    ; (app-identification)
-    (testing "Returns the app associated with the given credentials")))
+(deftest client-secret-auth
+  (testing "Based on authorizeation header"
+    (testing "Has to be a `Basic` header")
+    (testing "Credentials have to be Base64-encoded and separated by a colon"))
+  (testing "Based on parameters"
+    (testing "Has to be a matching known pair of `client_id` and `client_secret`")))
 
 (deftest authorization-verification
   ; (app-identification)
@@ -48,17 +51,11 @@
   (testing "Response type"
     (testing "Only `code` is supported")) ; unsupported_response_type
   (testing "Scope validation"
-    (testing "At least one scope is required")
-    (testing "Unknown scopes are ignored")
     (testing "Must be a subset of those registered with the app")) ; invalid_scope
   (testing "Relay `state`"
     (testing "Gets passed on correctly"))
   (testing "Redirect URI"
-    (testing "Given none, default is used")))
-
-(deftest authorization-form
-  ; (authorization-verification)
-  (testing "Display authorization form"))
+    (testing "Must be one of those registered with the app"))) ; display error
 
 (deftest authorization
   ; (authorization-verification)
