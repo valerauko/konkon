@@ -57,7 +57,7 @@
   [raw-input]
   (let [input-array (split (str raw-input) #"\s+")]
     (if (s/valid? ::uri-coll input-array)
-      (sort (uniq input-array))))) ; maybe use set?
+      (sort (distinct input-array))))) ; maybe use set?
 
 (s/def ::password ::user/pass)
 (s/def ::grant-type #{"authorization-code" "password" "refresh-token"})
