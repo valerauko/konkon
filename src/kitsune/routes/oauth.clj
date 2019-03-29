@@ -1,5 +1,5 @@
 (ns kitsune.routes.oauth
-  (:require [kitsune.handlers.oauth :refer [register-app auth-form authorize
+  (:require [kitsune.handlers.oauth :refer [register-app authorize
                                             exchange-token]]
             [kitsune.wrappers.oauth :as oauth-wrapper]
             [kitsune.spec.oauth :as oauth-spec]
@@ -19,10 +19,10 @@
     {:swagger {:tags ["OAuth"]}}
     ["/authorize"
      {:summary "OAuth authorization form"
-      :get {:swagger {:produces #{"text/html"}}
-            :responses {200 {:description "Form to authorize app"
-                             :body any?}}
-            :handler auth-form}
+      ; :get {:swagger {:produces #{"text/html"}}
+      ;       :responses {200 {:description "Form to authorize app"
+      ;                        :body any?}}
+      ;       :handler auth-form}
       :post {:swagger {:produces #{"text/html"}}
              :parameters oauth-spec/authorize-params
              :responses

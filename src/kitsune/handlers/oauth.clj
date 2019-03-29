@@ -28,22 +28,6 @@
       (unprocessable-entity {:error "Invalid redirection URIs"}))
     (unprocessable-entity {:error "Requested scope(s) not acceptable."})))
 
-(def scope-meanings
-  {"read" "to read every detail of your account"
-   "write" "to edit your profile and post on your behalf"
-   "follow" "(un)follow or (un)block users"
-   "push" "receive push notifications for you"})
-
-(defhandler auth-form
-  [{{:keys [scope] :as query-params} :query-params :as req}]
-  {:status 200
-   :body (render-resource "templates/app_auth_form.html"
-                          (merge (clojure.walk/keywordize-keys query-params)
-                                 {:scopes (some->> scope
-                                                   spec/valid-scope
-                                                   (map scope-meanings))}))
-   :headers {"Content-type" "text/html"}})
-
 (defhandler auth-result
   [auth]
   ; TODO: return an actual html page
@@ -72,7 +56,7 @@
         (ok (auth-result auth))
         (let [target-uri (uri-for-redirect redirect-uri auth state)]
           (found target-uri)))
-      (auth-form {:query-params params})))) ; render the auth page again if failed
+      (bad-request {:query-params params})))) ; render the auth page again if failed
 
 (defn base64-padfix
   [^String str]
