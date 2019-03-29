@@ -55,7 +55,8 @@
 
 (defn coerce-uris
   [raw-input]
-  (let [input-array (split (str raw-input) #"\s+")]
+  (let [string (if raw-input (str raw-input) "urn:ietf:wg:oauth:2.0:oob")
+        input-array (split string #"\s+")]
     (if (s/valid? ::uri-coll input-array)
       (sort (distinct input-array))))) ; maybe use set?
 
