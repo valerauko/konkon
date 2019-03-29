@@ -34,7 +34,7 @@ update accounts set
                  "=" key)))
      (clojure.string/join ", "))
 ~*/
-where uri = :uri
+where lower(uri) = :uri
 returning *
 
 -- :name update-private-key! :<! :1

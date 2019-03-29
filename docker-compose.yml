@@ -18,7 +18,8 @@ services:
           - kitsune.devel
 
   docker_db:
-    image: postgres:alpine
+    image: postgres:9.6-alpine
+    container_name: docker_db
     volumes:
       - ./psql:/var/lib/postgresql/data
     environment:
