@@ -46,7 +46,7 @@
   (let [user (user-db/for-login email password)
         app (db/find-for-auth conn {:client-id client-id
                                     :redirect-uri redirect-uri})
-        scope-array (spec/valid-scope scope)]
+        scope-array (spec/coerce-scopes scope)]
     ; TODO: make sure that the requested scopes are a subset of the app's
     (if-let [auth (and user app scope-array
                        (db/create-auth! conn {:user-id (:id user)

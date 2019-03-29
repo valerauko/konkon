@@ -10,9 +10,9 @@
           (is (= coerced nil)))
         (let [coerced (spec/coerce-scopes "")]
           (is (= coerced nil))))
-      (testing "Unkowm scopes are ignored"
+      (testing "If unknown scopes are present, it's treated as invalid"
         (let [coerced (spec/coerce-scopes "read write hoge")]
-          (is (= coerced ["read write"])))))
+          (is (= coerced nil)))))
     (testing "Redirect URI validation"
       (testing "Given none or the default, the default is used"
         (let [coerced (spec/coerce-uris nil)]
