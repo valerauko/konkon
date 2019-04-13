@@ -94,7 +94,7 @@
                        :basePath "/"}
              :handler (create-swagger-handler)}}]]
     {:conflicts identity ; mastodon routes conflict all over the place so don't even log
-     :validate ring-spec/validate-spec!
+     :validate ring-spec/validate
      :data {:muuntaja negotiator
             :coercion spec/coercion
             :swagger {:id ::api}
