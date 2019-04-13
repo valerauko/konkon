@@ -5,7 +5,7 @@ insert into apps (name,
   values (:name,
   --~ (if (not-empty (:redirect-uris params)) "array[:v*:redirect-uris],")
   array[:v*:scopes], :website)
-  returning id, client_id, secret
+  returning id, client_id, secret as client_secret
 
 -- :name find-for-auth :? :1
 select id from apps

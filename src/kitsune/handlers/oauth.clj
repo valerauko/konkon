@@ -19,7 +19,7 @@
       (if-let [result (db/create-app! conn
                                       {:website website
                                        :name client-name
-                                       :redirect-uris redirect-uris
+                                       :redirect-uris uri-array
                                        :scopes scope-array})]
         (ok result)
         ; REVIEW: this really shouldn't happen unless the fields are wrong type

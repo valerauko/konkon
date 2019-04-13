@@ -34,7 +34,7 @@
 (s/def ::client-secret ::secret)
 
 (s/def ::register-response
-  (s/keys :req-un [::id ::client-id ::secret]))
+  (s/keys :req-un [::id ::client-id ::client-secret]))
 
 (s/def ::authorization
   (s/and string?
