@@ -13,7 +13,7 @@
 ; TODO: return spec errors https://tools.ietf.org/html/rfc6749#section-5.2
 
 (defhandler register-app
-  [{{:keys [scopes redirect-uris website client-name]} :body-params :as req}]
+  [{{:keys [scopes redirect-uris website client-name]} :form-params :as req}]
   (if-let [scope-array (spec/coerce-scopes scopes)]
     (if-let [uri-array (spec/coerce-uris redirect-uris)]
       (if-let [result (db/create-app! conn

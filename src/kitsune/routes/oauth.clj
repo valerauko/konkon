@@ -11,7 +11,7 @@
      ["/apps"
       {:swagger {:tags ["OAuth"]}
        :post {:summary "OAuth app registration"
-              :parameters {:body ::oauth-spec/create-app}
+              :parameters {:form ::oauth-spec/create-app}
               :produces #{"application/json"}
               :responses {200 {:body ::oauth-spec/register-response}}
               :handler register-app}}]]]
