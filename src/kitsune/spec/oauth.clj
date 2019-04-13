@@ -15,7 +15,7 @@
   (s/or :default-value #(= % "urn:ietf:wg:oauth:2.0:oob")
         :absolute-uri (s/and uri/absolute?
                              #(empty? (uri/fragment %))
-                             #(= (uri/scheme %) "https"))))
+                             #(not= (uri/scheme %) "http"))))
 (s/def ::uri-coll
   (s/coll-of ::redirect-uri))
 (s/def ::redirect-uris string?)
