@@ -20,7 +20,7 @@
       (testing "All given redirect URIs have to be absolute URIs"
         (let [coerced (spec/coerce-uris "./usr/local/hoge https://example.com")]
           (is (= coerced nil))))
-      (testing "Only HTTPS redirect URIs are allowed"
+      (testing "Unsafe HTTP redirect URIs are not allowed"
         (let [coerced (spec/coerce-uris "http://example.com https://example.com")]
           (is (= coerced nil))))
       (testing "Query params in the redirect URIs are retained"
