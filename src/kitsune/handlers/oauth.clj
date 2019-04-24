@@ -60,9 +60,11 @@
 
 (defn base64-padfix
   [^String str]
-  (->> (url-decode str)
-    (.decode (Base64/getDecoder))
-    (.encodeToString (Base64/getEncoder))))
+  (try
+    (->> (url-decode str)
+         (.decode (Base64/getDecoder))
+         (.encodeToString (Base64/getEncoder)))
+    (catch Throwable e)))
 
 (defn app-from-request
   "According to the OAuth spec, passing client credentials in Basic HTTP header
