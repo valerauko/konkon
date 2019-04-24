@@ -1,6 +1,7 @@
 (ns kitsune.oauth-test
   (:require [clojure.test :refer :all]
-            [kitsune.spec.oauth :as spec]))
+            [kitsune.spec.oauth :as spec]
+            [kitsune.handlers.oauth :as handlers]))
 
 (deftest app-registration
   (testing "App registration"
@@ -39,11 +40,27 @@
     (testing "Has to be a known `client_id`")))
 
 (deftest client-secret-auth
-  (testing "Based on authorizeation header"
-    (testing "Has to be a `Basic` header")
-    (testing "Credentials have to be Base64-encoded and separated by a colon"))
-  (testing "Based on parameters"
-    (testing "Has to be a matching known pair of `client_id` and `client_secret`")))
+  (with-redefs [kitsune.db.oauth/find-for-session
+                 (fn [_ {:keys [client-id client-secret]}]
+                   (and (= client-id "Zm9v")
+                        (= client-secret "YmFy")))]
+    (testing "Based on authorizeation header"
+      (let [correct "Zm9v:YmFy"]
+        (testing "Has to be a `Basic` header"
+          (is (handlers/app-from-request
+                {:headers {"Authorization" (str "Basic " correct)}}))
+          (is (not (handlers/app-from-request
+                     {:headers {"Authorization" (str "Bearer " correct)}})))))
+      (testing "Credentials format"
+        (testing "Base64-encoded"
+          (is (not (handlers/app-from-request
+                    {:headers {"Authorization" (str "Basic " "hog@\"e:oo")}}))))
+        (testing "Separated by a colon"
+          (is (not (handlers/app-from-request
+                     {:headers {"Authorization" (str "Basic " "Zm9v-YmFy")}}))))))
+    (testing "Based on parameters"
+      (testing "Has to be a matching known pair of `client_id` and `client_secret`"))
+    (testing "Header authn takes precedence")))
 
 (deftest authorization-verification
   ; (app-identification)

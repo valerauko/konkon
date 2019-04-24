@@ -70,18 +70,20 @@
   "According to the OAuth spec, passing client credentials in Basic HTTP header
   is preferable to passing them in the request body."
   [{{:keys [client-id client-secret redirect-uri]} :body-params :as req}]
-  (let [[id secret] (some->> req :headers :authorization
+  (let [auth-header (get-in req [:headers "Authorization"])
+        [id secret] (some->> auth-header
                              (re-matches #"^Basic ([^:]+):(.+)")
                              rest
                              (map base64-padfix))]
     (if (and id secret)
-      ; TODO: separate client_secret auth and client_id only auth
       (db/find-for-session conn {:client-id id
                                  :client-secret secret
                                  :redirect-uri redirect-uri})
       ; not sure if merge + select-keys would be better?
-      (db/find-for-auth conn {:client-id client-id
-                              :redirect-uri redirect-uri}))))
+      (if (and client-id client-secret)
+        (db/find-for-session conn {:client-id client-id
+                                   :client-secret client-secret
+                                   :redirect-uri redirect-uri})))))
 
 (defn exc-pass
   "Password authentication is reserved for server-side web frontends and
