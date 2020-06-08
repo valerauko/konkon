@@ -33,6 +33,18 @@
     ;    (assoc-in [:formats "text/html"] (text-format/format "text/html"))
     )))
 
+(defn sanitize-params
+  [params]
+  (let [sensitive-keys #{:password :password-confirm}]
+    (reduce-kv
+      (fn redact [aggr key value]
+        (assoc aggr key
+               (if (sensitive-keys key)
+                 "*redacted*"
+                 value)))
+      {}
+      params)))
+
 (defn wrap-logging
   [handler]
   (fn [{:keys [request-method uri remote-addr]
@@ -45,6 +57,7 @@
                   {:status (:status response)
                    :method request-method
                    :path uri
+                   :params (sanitize-params (:params request))
                    :route route
                    :remote-addr (or fwd-for remote-addr)
                    :response-time (/ (- (System/nanoTime) start) 1000000.0)}))
